@@ -1,0 +1,15 @@
+name: CI
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - beta
+      - main
+      - master
+jobs:
+  ci:
+    uses: plumelo/dev/.github/workflows/node.yml@master
+    secrets: inherit
