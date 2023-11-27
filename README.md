@@ -1,2 +1,2 @@
 # rollup-plugin-thunder
-A lightningscss rollup plugin
+A lightningcss rollup plugin
