@@ -42,6 +42,11 @@ const resolveAsync = async (
     ),
   );
 
+const resolveRelative = (specifier: string, from: string) => {
+  const rel = path.resolve(path.dirname(from), specifier);
+  return fs.lstat(rel).then(() => rel);
+};
+
 export default function thunder(input: Options = {}): Plugin {
   const filter = createFilter(input.include, input.exclude);
   const { options = {} as LightningOptions } = input;
@@ -55,13 +60,10 @@ export default function thunder(input: Options = {}): Plugin {
         ...options,
         filename: id,
         resolver: {
-          resolve(specifier: string, from: string) {
-            const rel = path.resolve(path.dirname(from), specifier);
-            return fs.lstat(rel).then(
-              () => rel,
-              () => resolveAsync(specifier),
-            );
-          },
+          resolve: (specifier: string, from: string) =>
+            resolveRelative(specifier, from)
+              .catch(() => resolveRelative(`${specifier}.css`, from))
+              .catch(() => resolveAsync(specifier)),
         },
       });
       const map = "map" in res ? res.map?.toString() : undefined;
