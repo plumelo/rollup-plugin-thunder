@@ -20,6 +20,7 @@ export interface Options {
   include?: FilterPattern;
   exclude?: FilterPattern;
   options?: LightningOptions;
+  autoModules?: boolean;
 }
 
 const resolveAsync = async (
@@ -49,6 +50,7 @@ const resolveRelative = (specifier: string, from: string) => {
 
 export default function thunder(input: Options = {}): Plugin {
   const filter = createFilter(input.include, input.exclude);
+  const modulesFilter = createFilter(["**/*.module.css"]);
   const { options = {} as LightningOptions } = input;
   if (!("targets" in options))
     options["targets"] = browserslistToTargets(browserslist());
@@ -56,6 +58,9 @@ export default function thunder(input: Options = {}): Plugin {
     name: "thunder",
     async load(id: string) {
       if (!filter(id)) return null;
+      if (!options.cssModules && input.autoModules && modulesFilter(id)) {
+        options.cssModules = true;
+      }
       const res = await bundleAsync({
         ...options,
         filename: id,
