@@ -83,7 +83,7 @@ export default function thunder(input: Options = {}): Plugin {
             [exp.name, ...exp.composes.map(({ name }) => name)].join(" "),
           ]),
         );
-        code += `export ${JSON.stringify(klass)}`;
+        code += `export const ${JSON.stringify(klass)}`;
       }
 
       return {
