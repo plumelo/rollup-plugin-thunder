@@ -90,7 +90,9 @@ export default function thunder(input: Options = {}): Plugin {
       }
 
       return {
-        code: res.code.toString(),
+          code: `
+            export default ${JSON.stringify(res.code.toString())}
+          `,
         map,
       };
     },
