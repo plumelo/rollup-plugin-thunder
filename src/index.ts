@@ -72,9 +72,7 @@ export default function thunder(input: Options = {}): Plugin {
         },
       });
       const map = "map" in res ? res.map?.toString() : undefined;
-      let code = `
-        export default ${JSON.stringify(res.code.toString())}
-      `;
+      let code = `export default ${JSON.stringify(res.code.toString())};`;
 
       if ("cssModules" in options) {
         code += Object.entries(res.exports ?? {})
