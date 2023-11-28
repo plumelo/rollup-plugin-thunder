@@ -72,6 +72,9 @@ export default function thunder(input: Options = {}): Plugin {
         },
       });
       const map = "map" in res ? res.map?.toString() : undefined;
+      let code = `
+        export default ${JSON.stringify(res.code.toString())}
+      `;
 
       if ("cssModules" in options) {
         const klass = Object.fromEntries(
@@ -80,19 +83,11 @@ export default function thunder(input: Options = {}): Plugin {
             [exp.name, ...exp.composes.map(({ name }) => name)].join(" "),
           ]),
         );
-        return {
-          code: `
-            export const css = ${JSON.stringify(res.code.toString())}
-            export default ${JSON.stringify(klass)}
-          `,
-          map,
-        };
+        code += `export ${JSON.stringify(klass)}`;
       }
 
       return {
-          code: `
-            export default ${JSON.stringify(res.code.toString())}
-          `,
+        code,
         map,
       };
     },
