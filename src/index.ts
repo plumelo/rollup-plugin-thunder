@@ -77,13 +77,14 @@ export default function thunder(input: Options = {}): Plugin {
       `;
 
       if ("cssModules" in options) {
-        const klass = Object.fromEntries(
-          Object.entries(res.exports ?? {}).map(([key, exp]) => [
-            key,
-            [exp.name, ...exp.composes.map(({ name }) => name)].join(" "),
-          ]),
-        );
-        code += `export const ${JSON.stringify(klass)}`;
+        code += Object.entries(res.exports ?? {})
+          .map(
+            ([key, exp]) =>
+              `export const ${key} = ${JSON.stringify(
+                [exp.name, ...exp.composes.map(({ name }) => name)].join(" "),
+              )};`,
+          )
+          .join("");
       }
 
       return {
