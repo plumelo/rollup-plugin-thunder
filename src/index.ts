@@ -53,7 +53,7 @@ const dashesCamelCase = (str: string) => {
 export default function thunder(input: Options = {}): Plugin {
   const filter = createFilter(input.include, input.exclude);
   const modulesFilter = createFilter(["**/*.module.css"]);
-  const { options = {} as LightningOptions } = input;
+  const options = { ...input.options };
   if (!("targets" in options))
     options["targets"] = browserslistToTargets(browserslist());
   return {
