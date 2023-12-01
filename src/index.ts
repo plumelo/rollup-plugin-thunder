@@ -64,7 +64,7 @@ export default function thunder(input: Options = {}): Plugin {
       if (!filter(id)) return null;
       const options = {
         ...opts,
-        cssModules: opts.cssModules || (input.autoModules && modulesFilter(id)),
+        cssModules: opts.cssModules ?? (input.autoModules && modulesFilter(id)),
         filename: id,
         resolver: {
           resolve: (specifier: string, from: string) =>
@@ -77,7 +77,7 @@ export default function thunder(input: Options = {}): Plugin {
       const map = "map" in res ? res.map?.toString() : undefined;
       let code = `export default ${JSON.stringify(res.code.toString())};`;
 
-      if ("cssModules" in options) {
+      if (options.cssModules) {
         code += Object.entries(res.exports ?? {})
           .map(
             ([key, exp]) =>
