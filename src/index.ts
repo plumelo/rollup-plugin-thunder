@@ -47,24 +47,24 @@ const resolveRelative = (specifier: string, from: string) => {
   const rel = path.resolve(path.dirname(from), specifier);
   return fs.lstat(rel).then(() => rel);
 };
+
 const dashesCamelCase = (str: string) => {
   return str.replace(/-+(\w)/g, (_, firstLetter) => firstLetter.toUpperCase());
 };
+
 export default function thunder(input: Options = {}): Plugin {
   const filter = createFilter(input.include, input.exclude);
   const modulesFilter = createFilter(["**/*.module.css"]);
-  const options = { ...input.options };
-  if (!("targets" in options))
-    options["targets"] = browserslistToTargets(browserslist());
+  const opts = { ...input.options };
+  if (!("targets" in opts))
+    opts["targets"] = browserslistToTargets(browserslist());
   return {
     name: "thunder",
     async load(id: string) {
       if (!filter(id)) return null;
-      if (!options.cssModules && input.autoModules && modulesFilter(id)) {
-        options.cssModules = true;
-      }
-      const res = await bundleAsync({
-        ...options,
+      const options = {
+        ...opts,
+        cssModules: opts.cssModules || (input.autoModules && modulesFilter(id)),
         filename: id,
         resolver: {
           resolve: (specifier: string, from: string) =>
@@ -72,7 +72,8 @@ export default function thunder(input: Options = {}): Plugin {
               .catch(() => resolveRelative(`${specifier}.css`, from))
               .catch(() => resolveAsync(specifier)),
         },
-      });
+      };
+      const res = await bundleAsync(options);
       const map = "map" in res ? res.map?.toString() : undefined;
       let code = `export default ${JSON.stringify(res.code.toString())};`;
 
