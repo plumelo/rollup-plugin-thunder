@@ -7,7 +7,7 @@ import {
   TransformOptions,
 } from "lightningcss";
 import browserslist from "browserslist";
-import resolve, { AsyncOpts } from "resolve";
+import resolve, { ResolveOptionsOptionalFS } from "enhanced-resolve";
 import path from "path";
 import fs from "fs/promises";
 
@@ -23,25 +23,20 @@ export interface Options {
   autoModules?: boolean;
 }
 
-const resolveAsync = async (
-  id: string,
-  options: AsyncOpts = {},
-): Promise<string> =>
-  new Promise((solve, reject) =>
-    resolve(
-      id,
-      {
-        ...options,
-        preserveSymlinks: true,
-        extensions: options.extensions ?? [".css"],
-      },
-      (err, resolved) => {
+const resolveAsync = (options?: ResolveOptionsOptionalFS) => {
+  const resolver = resolve.create({
+    ...options,
+    extensions: options?.extensions ?? [".css"],
+  });
+  return (specifier: string, from: string) =>
+    new Promise<string>((resolve, reject) =>
+      resolver(from, specifier, (err, resolved) => {
         if (err || !resolved)
-          return reject(`Failed to resolve import: ${id} ${err}`);
-        return solve(resolved);
-      },
-    ),
-  );
+          return reject(`Failed to resolve import: ${from} ${err}`);
+        return resolve(resolved);
+      }),
+    );
+};
 
 const resolveRelative = (specifier: string, from: string) => {
   const rel = path.resolve(path.dirname(from), specifier);
@@ -58,6 +53,7 @@ export default function thunder(input: Options = {}): Plugin {
   const opts = { ...input.options };
   if (!("targets" in opts))
     opts["targets"] = browserslistToTargets(browserslist());
+  const resolver = resolveAsync();
   return {
     name: "thunder",
     async load(id: string) {
@@ -70,7 +66,7 @@ export default function thunder(input: Options = {}): Plugin {
           resolve: (specifier: string, from: string) =>
             resolveRelative(specifier, from)
               .catch(() => resolveRelative(`${specifier}.css`, from))
-              .catch(() => resolveAsync(specifier)),
+              .catch(() => resolver(specifier, from)),
         },
       };
       const res = await bundleAsync(options);
