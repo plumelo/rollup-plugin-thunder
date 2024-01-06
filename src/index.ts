@@ -1,4 +1,4 @@
-import type { Plugin } from "rollup";
+import type { Plugin, ModuleInfo as BaseModuleInfo } from "rollup";
 import { createFilter, FilterPattern } from "@rollup/pluginutils";
 import {
   bundleAsync,
@@ -20,7 +20,12 @@ export interface Options {
   include?: FilterPattern;
   exclude?: FilterPattern;
   options?: LightningOptions;
+  styleSheet?: boolean;
   autoModules?: boolean;
+}
+
+interface ModuleInfo extends BaseModuleInfo {
+  assertions: { type: string };
 }
 
 const resolveAsync = (options?: ResolveOptionsOptionalFS) => {
@@ -71,7 +76,15 @@ export default function thunder(input: Options = {}): Plugin {
       };
       const res = await bundleAsync(options);
       const map = "map" in res ? res.map?.toString() : undefined;
-      let code = `export default ${JSON.stringify(res.code.toString())};`;
+      const rawCode = JSON.stringify(res.code.toString());
+      const moduleInfo = this.getModuleInfo(id) as ModuleInfo;
+
+      let code =
+        input.styleSheet ||
+        moduleInfo.attributes.type == "css" ||
+        moduleInfo?.assertions?.type == "css"
+          ? `const sheet = new CSSStyleSheet();sheet.replaceSync(${rawCode});export default sheet;`
+          : `export default ${rawCode}`;
 
       if (options.cssModules) {
         code += Object.entries(res.exports ?? {})
