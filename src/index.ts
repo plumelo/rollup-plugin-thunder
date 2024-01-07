@@ -81,7 +81,7 @@ export default function thunder(input: Options = {}): Plugin {
 
       let code =
         input.styleSheet ||
-        moduleInfo.attributes.type == "css" ||
+        moduleInfo.attributes?.type == "css" ||
         moduleInfo?.assertions?.type == "css"
           ? `const sheet = new CSSStyleSheet();sheet.replaceSync(${rawCode});export default sheet;`
           : `export default ${rawCode}`;
