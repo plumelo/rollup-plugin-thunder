@@ -87,14 +87,16 @@ export default function thunder(input: Options = {}): Plugin {
           : `export default ${rawCode};`;
 
       if (options.cssModules) {
+        code += "let classes = {};";
         code += Object.entries(res.exports ?? {})
           .map(
             ([key, exp]) =>
-              `export const ${dashesCamelCase(key)} = ${JSON.stringify(
+              `classes["${dashesCamelCase(key)}"] = ${JSON.stringify(
                 [exp.name, ...exp.composes.map(({ name }) => name)].join(" "),
               )};`,
           )
           .join("");
+        code += `export { classes, classes as C };`;
       }
 
       return {
