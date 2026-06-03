@@ -12,9 +12,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "pretty": true,
+    "ignoreDeprecations": "6.0",
     "sourceMap": true,
     "strict": true,
-    "target": "es2019"
+    "target": "es2019",
+    "types": ["node"]
   },
   "include": [
     "src"
