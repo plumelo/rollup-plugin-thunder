@@ -28,12 +28,16 @@
     "plugin",
     "lightningcss"
   ],
-  "author": "Meghea Iulian-Flavius <iulian@plumelo.ocm>",
+  "author": "Meghea Iulian-Flavius <iulian@plumelo.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/plumelo/rollup-plugin-thunder/issues"
   },
   "homepage": "https://github.com/plumelo/rollup-plugin-thunder#readme",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "devDependencies": {
     "@commitlint/cli": "^21.0.0",
     "@commitlint/config-conventional": "^21.0.0",
