@@ -47,7 +47,7 @@
     "@types/node": "^26.0.0",
     "prettier": "^3.1.0",
     "rollup": "^4.5.2",
-    "semantic-release": "^25.0.1",
+    "semantic-release": "^26.0.1",
     "tslib": "^2.6.2",
     "typescript": "^6.0.3"
   },
